@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скремблер і Дескремблер</title>
+</head>
+<body>
+    <h2>Скремблер і Дескремблер</h2>
+    <!-- Кнопка для запуску процесу генерації, скремблування та декремблування -->
+    <button onclick="performScrambling()">Генерувати і Скремблювати</button>
+    <!-- Вивід результатів -->
+    <p><strong>Оригінальна послідовність (перші 10 бітів):</strong> <span id="originalSequence"></span></p>
+    <p><strong>Скрембльована послідовність (перші 10 бітів):</strong> <span id="scrambledSequence"></span></p>
+    <p><strong>Декрембльована послідовність (перші 10 бітів):</strong> <span id="descrambledSequence"></span></p>
+
+    <script>
+        // Функція для генерації випадкової послідовності 0 та 1 заданої довжини
+        function generateRandomSequence(length) {
+            let sequence = [];
+            for (let i = 0; i < length; i++) {
+                // Додавання в масив випадкового числа 0 або 1
+                sequence.push(Math.floor(Math.random() * 2));
+            }
+            return sequence;
+        }
+
+        // Функція для скремблування вхідної послідовності
+        function scramble(inputSequence, shiftRegister) {
+            let outputSequence = [];
+            for (let i = 0; i < inputSequence.length; i++) {
+                // Виконання XOR операції між поточним бітом послідовності та першим бітом зсувного регістру
+                let firstBit = shiftRegister[0];
+                let scrambledBit = inputSequence[i] ^ firstBit;
+                outputSequence.push(scrambledBit);
+                // Оновлення зсувного регістру: видалення першого біта та додавання скрембльованого біта в кінець
+                shiftRegister.shift();
+                shiftRegister.push(scrambledBit);
+            }
+            return outputSequence;
+        }
+
+        // Функція для декремблування скрембльованої послідовності
+        function descramble(inputSequence, shiftRegister) {
+            let outputSequence = [];
+            for (let i = 0; i < inputSequence.length; i++) {
+                // Аналогічно, виконання XOR операції для декремблування
+                let firstBit = shiftRegister[0];
+                let descrambledBit = inputSequence[i] ^ firstBit;
+                outputSequence.push(descrambledBit);
+                // Оновлення зсувного регістру з додаванням біта із скрембльованої послідовності
+                shiftRegister.shift();
+                shiftRegister.push(inputSequence[i]);
+            }
+            return outputSequence;
+        }
+
+        // Функція для запуску процесу генерації, скремблування та декремблування
+        function performScrambling() {
+            // Встановлення довжини послідовності та ініціалізація зсувного регістру
+            let K = 1000;
+            let shiftRegisterInitial = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1];
+
+            // Генерація випадкової послідовності
+            let originalSequence = generateRandomSequence(K);
+
+            // Скремблування послідовності
+            let scrambledSequence = scramble(originalSequence, shiftRegisterInitial.slice());
+
+            // Декремблування послідовності
+            let descrambledSequence = descramble(scrambledSequence, shiftRegisterInitial.slice());
+
+            // Виведення результатів на сторінку
+            document.getElementById('originalSequence').textContent = originalSequence.slice(0, 10).join("");
+            document.getElementById('scrambledSequence').textContent = scrambledSequence.slice(0, 10).join("");
+            document.getElementById('descrambledSequence').textContent = descrambledSequence.slice(0, 10).join("");
+        }
+    </script>
+</body>
+</html>
